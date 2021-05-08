@@ -117,7 +117,10 @@ signals['long_mavg']=aapl['Close'].rolling(window=long_window,min_periods=1,cent
 signals['signal'][short_window:]=np.where(signals['short_mavg'][short_window:]>
                                           signals['long_mavg'][short_window:],1.0,0.0)
 signals['positions']=signals['signal'].diff()
-#print(signals)
+
+signals['positions'].plot()
+signals['signal'].plot()
+plt.show()
 
 #fig=plt.figure()
 #ax1=fig.add_subplot(111, ylabel="Price in $")
@@ -138,14 +141,33 @@ portfolio['holdings']=(positions.multiply(aapl['Adj Close'],axis=0)).sum(axis=1)
 portfolio['cash']=inintial_capital-(pos_diff.multiply(aapl['Adj Close'],axis=0)).sum(axis=1).cumsum()
 portfolio['total']=portfolio['cash']+portfolio['holdings']
 portfolio['returns']=portfolio['total'].pct_change()
-print(portfolio.head())
+#print(portfolio.head())
 
-fig=plt.figure()
-ax1=fig.add_subplot(111, ylabel="portfolio value in $")
-portfolio['total'].plot(ax=ax1, color='r', lw=2.)
+#fig=plt.figure()
+#ax1=fig.add_subplot(111, ylabel="portfolio value in $")
+#portfolio['total'].plot(ax=ax1, color='r', lw=2.)
 #signals[['short_mavg','long_mavg']].plot(ax=ax1, lw=2.)
-ax1.plot(portfolio.loc[signals.positions==1.0].index, portfolio.total[signals.positions==1.0],
-         '^', markersize=10, color='m')
-ax1.plot(portfolio.loc[signals.positions==-1.0].index, portfolio.total[signals.positions==-1.0],
-         'v',markersize=10, color='k')
-plt.show()
+#ax1.plot(portfolio.loc[signals.positions==1.0].index, portfolio.total[signals.positions==1.0],
+#         '^', markersize=10, color='m')
+#ax1.plot(portfolio.loc[signals.positions==-1.0].index, portfolio.total[signals.positions==-1.0],
+#         'v',markersize=10, color='k')
+#plt.show()
+
+# Print the Sharpe ratio
+returns=portfolio['returns']
+sharpe_ratio=np.sqrt(252)*(returns.mean()/returns.std())
+#print(sharpe_ratio)
+
+# Calculate the max drawdown
+window=252
+rolling_max=aapl['Adj Close'].rolling(window, min_periods=1).max()
+daily_drawdown=aapl['Adj Close']/rolling_max-1.0
+max_daily_drawdown=daily_drawdown.rolling(window, min_periods=1).min()
+#daily_drawdown.plot()
+#max_daily_drawdown.plot()
+#plt.show()
+
+# Calculate the CAGR
+days=(aapl.index[-1]-aapl.index[0]).days
+cagr=((((aapl['Adj Close'][-1])/aapl['Adj Close'][1]))**(365.0/days))-1
+print(cagr)
