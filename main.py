@@ -5,29 +5,26 @@ import matplotlib.pyplot as plt
 import numpy as np
 import statsmodels.api as sm
 from pandas import tseries
+import yfinance as yf
 
-def get(tickers, startday, endday):
-    def data(ticker):
-        return pdr.get_data_yahoo(ticker,start=startday,end=endday)
-    datas=map(data,tickers)
-    return pd.concat(datas,keys=tickers, names=['Ticker', 'Date'])
-tickers=[]
-with open('tickers.csv','r') as csvfile:
-    for line in csvfile.readlines():
-        line=line.strip()
-        line+='.KS'
-        tickers.append(line)
-print(tickers)
+def get_current_price(symbol):
+    ticker = yf.Ticker(symbol)
+    todays_data = ticker.history(period='1d')
+    return todays_data['Close'][0]
 
-all_data=get(tickers,datetime.datetime(2021,4,1),datetime.date.today())
-daily_close_px=all_data[['Adj Close']].reset_index().pivot('Date', 'Ticker', 'Adj Close')
-# daily_pct_change_px=daily_close_px.pct_change()
-# #daily_pct_change_px.hist(bins=50, sharex=True, figsize=(12,8))
-# #plt.show()
-print(all_data)
-KS117680 = pdr.get_data_yahoo('117680.KS',
-                           start=datetime.datetime(2018, 4, 1),
-                           end=datetime.date.today())
+while True:
+    print(get_current_price('BTC-USD'))
+
+
+
+
+naver=pdr.get_data_naver
+
+
+# KS117680 = pdr.get_data_yahoo('117680.KS',
+#                            start=datetime.datetime(2018, 4, 1),
+#                            end=datetime.date.today())
+# print(KS117680.describe())
 
 #aapl['Close'].plot(grid = True)
 #brk_b['Close'].plot(grid = True)
