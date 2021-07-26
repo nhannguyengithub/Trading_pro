@@ -5,26 +5,44 @@ import matplotlib.pyplot as plt
 import numpy as np
 import statsmodels.api as sm
 from pandas import tseries
-import yfinance as yf
-
-def get_current_price(symbol):
-    ticker = yf.Ticker(symbol)
-    todays_data = ticker.history(period='1d')
-    return todays_data['Close'][0]
-
-while True:
-    print(get_current_price('BTC-USD'))
+# import yfinance as yf
+#
 
 
+import investpy
+
+# search_result = investpy.search_quotes(text='samsung', products=['stocks'],
+#                                        countries=['south korea'], n_results=1)
+# print(search_result)
+
+df = investpy.get_stock_historical_data(stock='005930',
+                                        country='south korea',
+                                        from_date='22/07/2021',
+                                        to_date='26/07/2021')
+print(df.head())
 
 
-naver=pdr.get_data_naver
+# data = yf.download(tickers='005930.KS', period='1d', interval='1m')
+# print(data['Close'])
 
 
-# KS117680 = pdr.get_data_yahoo('117680.KS',
-#                            start=datetime.datetime(2018, 4, 1),
-#                            end=datetime.date.today())
-# print(KS117680.describe())
+
+
+
+# def get(tickers, startday, endday):
+#     def data(ticker):
+#         return pdr.get_data_yahoo(ticker,start=startday,end=endday)
+#     datas=map(data,tickers)
+#     return pd.concat(datas,keys=tickers, names=['Ticker', 'Date'])
+# tickers=[]
+# with open('tickers.csv','r') as csvfile:
+#     for line in csvfile.readlines():
+#         line=line.strip()
+#         line+='.KS'
+#         tickers.append(line)
+# print(tickers)
+#
+# naver=pdr.get_data_naver
 
 #aapl['Close'].plot(grid = True)
 #brk_b['Close'].plot(grid = True)
