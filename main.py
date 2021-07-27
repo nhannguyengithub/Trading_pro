@@ -1,29 +1,49 @@
-import pandas_datareader as pdr
+import pandas_datareader.data as pdr
+import time
 import datetime
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import statsmodels.api as sm
 from pandas import tseries
-# import yfinance as yf
+import yfinance as yf
 #
 
 
-import investpy
+# import investpy
+#
+# # search_result = investpy.search_quotes(text='samsung', products=['stocks'],
+# #                                        countries=['south korea'], n_results=1)
+# # print(search_result)
+#
+# df = investpy.get_stock_historical_data(stock='005930',
+#                                         country='south korea',
+#                                         from_date='22/07/2021',
+#                                         to_date='26/07/2021')
+# print(df.head())
+tickers={'TIGER KRX게임K-뉴딜':'364990',
+        'KINDEX 미국WideMoat가치주':'309230',
+        'TIGER 2차전지테마':'305540',
+        'KODEX 2차전지산업':'305720',
+        'TIGER KRX BBIG K-뉴딜':'364960',
+        'TIGER KRX2차전지K-뉴딜':'364980',
+        'KODEX 게임산업':'300950',
+        'TIGER KRX인터넷K-뉴딜':'365000',
+        'KODEX 미디어&엔터테인먼트':'266360',
+        'TIGER 미디어컨텐츠':'228810'}
 
-# search_result = investpy.search_quotes(text='samsung', products=['stocks'],
-#                                        countries=['south korea'], n_results=1)
-# print(search_result)
+for name,symbol in tickers.items():
 
-df = investpy.get_stock_historical_data(stock='005930',
-                                        country='south korea',
-                                        from_date='22/07/2021',
-                                        to_date='26/07/2021')
-print(df.head())
+    df = pdr.DataReader(symbol, 'naver', start='2021-07-13', end=datetime.date.today())
+    price_buy=float(df.iat[0, df.columns.get_loc('Close')])
+    price=float(df.iat[-1, df.columns.get_loc('Close')])
+    change_pct=(price-price_buy)/price_buy*100
+    volume=df.iat[-1, df.columns.get_loc('Volume')]
+    print(name,symbol,price_buy,price,round(change_pct,2),'%',volume)
 
-
-# data = yf.download(tickers='005930.KS', period='1d', interval='1m')
-# print(data['Close'])
+    # data = yf.download(tickers='016880.KS', start='2021-07-27')
+    # print(data['Close'], data['Volume'])
+ #   time.sleep(5)
 
 
 
