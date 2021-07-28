@@ -7,6 +7,10 @@ import numpy as np
 import statsmodels.api as sm
 from pandas import tseries
 import yfinance as yf
+from PyQt5.QtWidgets import QApplication, QMainWindow
+import sys
+
+
 #
 
 
@@ -21,16 +25,18 @@ import yfinance as yf
 #                                         from_date='22/07/2021',
 #                                         to_date='26/07/2021')
 # print(df.head())
-tickers={'TIGER KRX게임K-뉴딜':'364990',
-        'KINDEX 미국WideMoat가치주':'309230',
-        'TIGER 2차전지테마':'305540',
-        'KODEX 2차전지산업':'305720',
-        'TIGER KRX BBIG K-뉴딜':'364960',
-        'TIGER KRX2차전지K-뉴딜':'364980',
-        'KODEX 게임산업':'300950',
-        'TIGER KRX인터넷K-뉴딜':'365000',
-        'KODEX 미디어&엔터테인먼트':'266360',
-        'TIGER 미디어컨텐츠':'228810'}
+# tickers={'TIGER KRX게임K-뉴딜':'364990',
+#         'KINDEX 미국WideMoat가치주':'309230',
+#         'TIGER 2차전지테마':'305540',
+#         'KODEX 2차전지산업':'305720',
+#         'TIGER KRX BBIG K-뉴딜':'364960',
+#         'TIGER KRX2차전지K-뉴딜':'364980',
+#         'KODEX 게임산업':'300950',
+#         'TIGER KRX인터넷K-뉴딜':'365000',
+#         'KODEX 미디어&엔터테인먼트':'266360',
+#         'TIGER 미디어컨텐츠':'228810'}
+
+tickers={'삼성전자':'005930'}
 
 for name,symbol in tickers.items():
 
