@@ -1,6 +1,6 @@
 import sys
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QWidget, QLabel, QLineEdit, QTableWidget
+from PyQt5.QtWidgets import QMainWindow, QWidget, QLabel, QLineEdit, QTableWidget, QTableWidgetItem
 from PyQt5.QtWidgets import QPushButton
 from PyQt5.QtCore import QSize
 
@@ -29,33 +29,34 @@ class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
 
-        self.setMinimumSize(QSize(500, 140))
+        self.setMinimumSize(QSize(500, 500))
         self.setWindowTitle("Trading Pro")
 
-        self.nameLabel_name = QLabel(self)
-        self.nameLabel_name.setText(name)
-        self.nameLabel_name.move(20, 20)
+        # self.nameLabel_name = QLabel(self)
+        # self.nameLabel_name.setText(name)
+        # self.nameLabel_name.move(20, 20)
+        #
+        # self.nameLabel_symbol = QLabel(self)
+        # self.nameLabel_symbol.setText(symbol)
+        # self.nameLabel_symbol.move(80, 20)
+        #
+        # self.nameLabel_price_buy = QLabel(self)
+        # self.nameLabel_price_buy.setText(str(price_buy))
+        # self.nameLabel_price_buy.move(140, 20)
+        #
+        # self.nameLabel_price = QLabel(self)
+        # self.nameLabel_price.setText(str(price))
+        # self.nameLabel_price.move(200, 20)
 
-        self.nameLabel_symbol = QLabel(self)
-        self.nameLabel_symbol.setText(symbol)
-        self.nameLabel_symbol.move(80, 20)
-
-        self.nameLabel_price_buy = QLabel(self)
-        self.nameLabel_price_buy.setText(str(price_buy))
-        self.nameLabel_price_buy.move(140, 20)
-
-        self.nameLabel_price = QLabel(self)
-        self.nameLabel_price.setText(str(price))
-        self.nameLabel_price.move(200, 20)
-
-        self.nameLabel_change_pct = QLabel(self)
-        self.nameLabel_change_pct.setText(str(change_pct))
-        self.nameLabel_change_pct.move(260, 20)
+        # self.nameLabel_change_pct = QLabel(self)
+        # self.nameLabel_change_pct.setText(str(change_pct))
+        # self.nameLabel_change_pct.move(260, 20)
 
         self.tableWidget = QTableWidget(self)
+        self.tableWidget.resize(290, 290)
         self.tableWidget.setRowCount(4)
         self.tableWidget.setColumnCount(2)
-        self.tableWidget.setItem(0,0, QTableWidgetItem("Cell (1,1)"))
+        self.tableWidget.setItem(0,0, QTableWidgetItem(name))
         self.tableWidget.setItem(0,1, QTableWidgetItem("Cell (1,2)"))
         self.tableWidget.setItem(1,0, QTableWidgetItem("Cell (2,1)"))
         self.tableWidget.setItem(1,1, QTableWidgetItem("Cell (2,2)"))
@@ -63,7 +64,8 @@ class MainWindow(QMainWindow):
         self.tableWidget.setItem(2,1, QTableWidgetItem("Cell (3,2)"))
         self.tableWidget.setItem(3,0, QTableWidgetItem("Cell (4,1)"))
         self.tableWidget.setItem(3,1, QTableWidgetItem("Cell (4,2)"))
-        self.tableWidget.move(0, 0)
+        self.tableWidget.move(50, 50)
+
 
 
         # self.line = QLineEdit(self)
@@ -73,13 +75,13 @@ class MainWindow(QMainWindow):
 
 
 
-        pybutton = QPushButton('OK', self)
-        pybutton.clicked.connect(self.clickMethod)
-        pybutton.resize(200,32)
-        pybutton.move(80, 60)
-
-    def clickMethod(self):
-        print('Your name: ' + self.line.text())
+    #     pybutton = QPushButton('OK', self)
+    #     pybutton.clicked.connect(self.clickMethod)
+    #     pybutton.resize(200,32)
+    #     pybutton.move(80, 60)
+    #
+    # def clickMethod(self):
+    #     print('Your name: ' + self.line.text())
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
