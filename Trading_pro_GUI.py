@@ -8,6 +8,8 @@ import pandas_datareader.data as pdr
 import time
 import datetime
 
+DURATION_INT=60
+
 ### get data
 
 tickers={'삼성전자':'005930'}
@@ -52,7 +54,7 @@ class MainWindow(QMainWindow):
         # self.nameLabel_change_pct = QLabel(self)
         # self.nameLabel_change_pct.setText(str(change_pct))
         # self.nameLabel_change_pct.move(260, 20)
-        i=1
+
 
         self.tableWidget = QTableWidget(self)
         self.tableWidget.resize(820, 290)
@@ -62,21 +64,35 @@ class MainWindow(QMainWindow):
         self.tableWidget.setItem(0,1, QTableWidgetItem(symbol))
         self.tableWidget.setItem(0,2, QTableWidgetItem(str(price)))
         self.tableWidget.setItem(0, 3, QTableWidgetItem(str(volume)))
-        self.tableWidget.setItem(1,1, QTableWidgetItem("Cell (3,1)"))
+        #self.tableWidget.setItem(1,1, QTableWidgetItem("Cell (3,1)"))
         self.tableWidget.setItem(2,0, QTableWidgetItem("Cell (3,1)"))
         self.tableWidget.setItem(2,1, QTableWidgetItem("Cell (3,2)"))
         self.tableWidget.setItem(3,0, QTableWidgetItem("Cell (4,1)"))
         self.tableWidget.setItem(3,1, QTableWidgetItem("Cell (4,2)"))
         self.tableWidget.move(20, 50)
 
-        # make QTimer
-        self.qTimer = QTimer()
-        # set interval to 1 s
-        self.qTimer.setInterval(1000)  # 1000 ms = 1 s
-        # connect timeout signal to signal handler
-#        self.qTimer.timeout.connect(float(volume))
-        # start timer
-        self.qTimer.start()
+
+
+    def startTimer(self):
+        self.time_left_int = DURATION_INT
+        self.myTimer = QtCore.QTimer(self)
+        self.myTimer.timeout.connect(self.timerTimeout)
+        self.myTimer.start(1000)
+
+    def timerTimeout(self):
+        self.time_left_int -= 1
+        if self.time_left_int == 0:
+            self.time_left_int = DURATION_INT
+
+        self.update_gui()
+
+    def update_gui(self):
+        # self.timerLabel.setText(str(self.time_left_int))
+        self.tableWidget.setItem(1, 1, QTableWidgetItem(str(self.time_left_int)))
+
+    startTimer()
+
+
 
 
 
