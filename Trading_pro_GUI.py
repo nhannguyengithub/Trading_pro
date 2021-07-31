@@ -12,7 +12,7 @@ DURATION_INT=60
 
 ### Input data
 
-buy_total=4000000.0/10
+buy_total=4000000.0
 tickers={'TIGER KRX게임K-뉴딜':'364990',
          'KBSTAR 200철강소재':'285020',
          'TIGER 200 철강소재':'139240',
@@ -23,6 +23,9 @@ tickers={'TIGER KRX게임K-뉴딜':'364990',
          'KODEX 배당성장':'211900',
          'TIGER 우량가치':'227570',
          'TIGER 2차전지테마':'305540'}
+start_day = datetime.date(2021, 7, 28)  ### Start day
+kospi_buy=2000                          ### KOSPI at buy
+
 
 ### GUI
 
@@ -52,6 +55,7 @@ class MainWindow(QMainWindow):
         # self.nameLabel_change_pct = QLabel(self)
         # self.nameLabel_change_pct.setText(str(change_pct))
         # self.nameLabel_change_pct.move(260, 20)
+        self.get_data()
 
 ### General table
         self.tableWidget_1 = QTableWidget(self)
@@ -60,8 +64,12 @@ class MainWindow(QMainWindow):
         self.tableWidget_1.setColumnCount(9)
         self.tableWidget_1.horizontalHeader().setStretchLastSection(True)
         self.tableWidget_1.verticalHeader().setFixedWidth(20)
-        self.tableWidget_1.setHorizontalHeaderLabels(['Ngày mua', 'Tong tien', 'KOSPI'])
+        self.tableWidget_1.setHorizontalHeaderLabels(['Ngày mua', 'Tổng tiền', 'KOSPI'])
         self.tableWidget_1.move(10,10)
+
+        self.tableWidget_1.setItem(0,0,QTableWidgetItem(str(start_day)))
+        self.tableWidget_1.setItem(0,1, QTableWidgetItem(str(buy_total)))
+        self.tableWidget_1.setItem(0,2, QTableWidgetItem(str(kospi_buy)))
 
 ### Porfolio table
         self.tableWidget_2 = QTableWidget(self)
@@ -80,7 +88,7 @@ class MainWindow(QMainWindow):
         self.tableWidget_3.setColumnCount(3)
         self.tableWidget_3.verticalHeader().setFixedWidth(20)
         self.tableWidget_3.setHorizontalHeaderLabels(['Ngày', 'Danh mục', 'KOSPI'])
-        start_day = datetime.date(2021,7,28)        ### Start day
+
         i=0
         for row in range(14):
             next_day=start_day+datetime.timedelta(days=row)
@@ -92,7 +100,7 @@ class MainWindow(QMainWindow):
 
         self.tableWidget_3.move(10, 455)
 
-        self.get_data()
+
 
 ### initiate cell value
         for row in range(10):
@@ -108,6 +116,7 @@ class MainWindow(QMainWindow):
         self.fill_buy_sum(10,4)
         self.fill_current_sum(10,6)
         self.fill_change_pct_sum(10,7)
+        self.fill_change_sum(1,1)    #table 1
         self.tableWidget_2.setItem(10, 3, QTableWidgetItem('Tổng mua'))
         self.tableWidget_2.setItem(10, 5, QTableWidgetItem('Tổng hiện tại'))
 
@@ -133,13 +142,14 @@ class MainWindow(QMainWindow):
                          'volume': float(df.iat[-1, df.columns.get_loc('Volume')])
                          }
             self.ticker[i]['change_pct']=round((self.ticker[i]['price']-self.ticker[i]['buy_price'])/self.ticker[i]['buy_price']*100,2)
-            self.ticker[i]['quantity']=int(round(buy_total/self.ticker[i]['price'],0))
+            self.ticker[i]['quantity']=int(round(buy_total/10/self.ticker[i]['price'],0))
             self.ticker[i]['buy'] = self.ticker[i]['buy_price']*self.ticker[i]['quantity']
             self.ticker[i]['current'] = self.ticker[i]['price'] * self.ticker[i]['quantity']
             self.buy_sum += self.ticker[i]['buy']
             self.current_sum += self.ticker[i]['current']
             i += 1
         self.change_pct_sum=round((self.current_sum-self.buy_sum)/self.buy_sum*100,2)
+        self.change_sum=round((self.current_sum-self.buy_sum),0)
 
     def timerTimeout(self):
         self.time_left_int -= 1
@@ -159,6 +169,7 @@ class MainWindow(QMainWindow):
             self.fill_volume(row)
             self.fill_current_sum(10, 6)
             self.fill_change_pct_sum(10, 7)
+            self.fill_change_sum(10, 8)
 
     def fill_name(self,row):
         self.tableWidget_2.setItem(row,0, QTableWidgetItem(self.ticker[row]['name']))
@@ -195,6 +206,9 @@ class MainWindow(QMainWindow):
 
     def fill_change_pct_sum(self, row, col):
         self.tableWidget_2.setItem(row, col, QTableWidgetItem(str(self.change_pct_sum)))
+
+    def fill_change_sum(self, row, col):
+        self.tableWidget_1.setItem(row, col, QTableWidgetItem('('+str(self.change_sum)+')'))
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
