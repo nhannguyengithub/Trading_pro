@@ -30,7 +30,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
 
-        self.setMinimumSize(QSize(960, 960))
+        self.setMinimumSize(QSize(960, 700))
         self.setWindowTitle("Trading Pro")
 
         # self.nameLabel_name = QLabel(self)
@@ -55,26 +55,42 @@ class MainWindow(QMainWindow):
 
 ### General table
         self.tableWidget_1 = QTableWidget(self)
-        self.tableWidget_1.resize(940, 160)
-        self.tableWidget_1.setRowCount(4)
+        self.tableWidget_1.resize(945, 85)
+        self.tableWidget_1.setRowCount(2)
         self.tableWidget_1.setColumnCount(9)
+        self.tableWidget_1.horizontalHeader().setStretchLastSection(True)
+        self.tableWidget_1.verticalHeader().setFixedWidth(20)
+        self.tableWidget_1.setHorizontalHeaderLabels(['Ngày mua', 'Tong tien', 'KOSPI'])
         self.tableWidget_1.move(10,10)
 
 ### Porfolio table
         self.tableWidget_2 = QTableWidget(self)
-        self.tableWidget_2.resize(940, 370)
+        self.tableWidget_2.resize(945, 360)
         self.tableWidget_2.setRowCount(11)
         self.tableWidget_2.setColumnCount(9)
+        self.tableWidget_2.horizontalHeader().setStretchLastSection(True)
+        self.tableWidget_2.verticalHeader().setFixedWidth(20)
         self.tableWidget_2.setHorizontalHeaderLabels(['Tên', 'Mã', 'Giá mua', 'Số lượng', 'Tổng mua', 'Giá hiện tại', 'Tổng hiện tại', 'Thay đổi (%)', 'Khối lượng ngày'])
-        self.tableWidget_2.move(10,170)
+        self.tableWidget_2.move(10,95)
 
 ### History table
         self.tableWidget_3 = QTableWidget(self)
-        self.tableWidget_3.resize(360, 400)
+        self.tableWidget_3.resize(340, 240)
         self.tableWidget_3.setRowCount(14)
         self.tableWidget_3.setColumnCount(3)
+        self.tableWidget_3.verticalHeader().setFixedWidth(20)
         self.tableWidget_3.setHorizontalHeaderLabels(['Ngày', 'Danh mục', 'KOSPI'])
-        self.tableWidget_3.move(10, 550)
+        start_day = datetime.date(2021,7,28)        ### Start day
+        i=0
+        for row in range(14):
+            next_day=start_day+datetime.timedelta(days=row)
+            if next_day.weekday() != 5 and next_day.weekday() != 6:
+                self.tableWidget_3.setItem(i, 0, QTableWidgetItem(str(next_day)))
+                i+=1
+
+
+
+        self.tableWidget_3.move(10, 455)
 
         self.get_data()
 
