@@ -25,6 +25,18 @@ tickers={'TIGER KRX게임K-뉴딜':'364990',
 start_day = datetime.date(2021, 7, 28)  ### Start day
 
 
+start_day_show=start_day ### Show start day
+
+current_time=datetime.datetime.now()
+market_open=current_time.replace(hour = 9, minute = 0, second = 0)
+market_close=current_time.replace(hour = 15, minute = 30, second = 0)
+
+if (current_time <market_open or current_time > market_close):
+    start_day+=datetime.timedelta(days=1)
+
+number_of_days=(datetime.date.today()-start_day).days
+buy_price_index = 'day0'
+current_price_index = 'day' + str(number_of_days - 2)
 
 ### GUI
 
@@ -47,7 +59,7 @@ class MainWindow(QMainWindow):
         self.tableWidget_1.setHorizontalHeaderLabels(['Ngày mua', 'Tổng tiền', 'KOSPI mua','KOSPI hiện tại'])
         self.tableWidget_1.move(10,10)
 
-        self.tableWidget_1.setItem(0,0,QTableWidgetItem(str(start_day)))
+        self.tableWidget_1.setItem(0,0,QTableWidgetItem(str(start_day_show)))
         self.tableWidget_1.setItem(0,1, QTableWidgetItem(str(buy_total)))
         self.tableWidget_1.setItem(0,2, QTableWidgetItem(str(self.kospi_buy)))
         self.tableWidget_1.setItem(0,3, QTableWidgetItem(str(self.kospi_current)))
@@ -68,10 +80,10 @@ class MainWindow(QMainWindow):
         for row in range(10):
             self.tableWidget_2.setItem(row, 0, QTableWidgetItem(self.ticker[row]['name']))
             self.tableWidget_2.setItem(row, 1, QTableWidgetItem(self.ticker[row]['symbol']))
-            self.tableWidget_2.setItem(row, 2, QTableWidgetItem(str(self.ticker[row]['buy_price'])))
+            self.tableWidget_2.setItem(row, 2, QTableWidgetItem(str(self.ticker[row][buy_price_index])))
             self.tableWidget_2.setItem(row, 3, QTableWidgetItem(str(self.ticker[row]['quantity'])))
             self.tableWidget_2.setItem(row, 4, QTableWidgetItem(str(self.ticker[row]['buy'])))
-            self.tableWidget_2.setItem(row, 5, QTableWidgetItem(str(self.ticker[row]['price'])))
+            self.tableWidget_2.setItem(row, 5, QTableWidgetItem(str(self.ticker[row][current_price_index])))
             self.tableWidget_2.setItem(row, 6, QTableWidgetItem(str(self.ticker[row]['current'])))
             self.tableWidget_2.setItem(row, 7, QTableWidgetItem(str(self.ticker[row]['change_pct'])))
             self.tableWidget_2.setItem(row, 8, QTableWidgetItem(str(self.ticker[row]['volume'])))
@@ -91,10 +103,12 @@ class MainWindow(QMainWindow):
         self.tableWidget_3.setHorizontalHeaderLabels(['Ngày', 'Danh mục', 'KOSPI'])
 
         i=0
-        for row in range(14):
+        for row in range(number_of_days):
             next_day=start_day+datetime.timedelta(days=row)
             if next_day.weekday() != 5 and next_day.weekday() != 6:
                 self.tableWidget_3.setItem(i, 0, QTableWidgetItem(str(next_day)))
+                self.tableWidget_3.setItem(i,2,QTableWidgetItem(str(self.ticker[-1]['day'+str(i+1)])))
+                print(i)
                 i+=1
 
         self.tableWidget_3.move(10, 455)
@@ -112,7 +126,7 @@ class MainWindow(QMainWindow):
         i =0
         self.buy_sum=0.0
         self.current_sum=0.0
-        number_of_days=(datetime.date.today()-start_day).days
+
         for name, symbol in tickers.items():
             df = pdr.DataReader(symbol, 'naver', start=start_day-datetime.timedelta(days=1), end=datetime.date.today())
             # print(df)
@@ -124,7 +138,7 @@ class MainWindow(QMainWindow):
                          }
             for j in range(number_of_days-1):
                 self.ticker[i]['day'+str(j)]=float(df.iat[j, df.columns.get_loc('Close')])
-            print(self.ticker[i]['day4'])
+
             self.ticker[i]['change_pct']=round((self.ticker[i]['price']-self.ticker[i]['buy_price'])/self.ticker[i]['buy_price']*100,2)
             self.ticker[i]['quantity']=int(round(buy_total/10/self.ticker[i]['buy_price'],0))
             self.ticker[i]['buy'] = self.ticker[i]['buy_price']*self.ticker[i]['quantity']
@@ -137,8 +151,8 @@ class MainWindow(QMainWindow):
 
         self.change_pct_sum=round((self.current_sum-self.buy_sum)/self.buy_sum*100,2)
         self.change_sum=round((self.current_sum-self.buy_sum),0)
-        self.kospi_buy=self.ticker[-1]['buy_price']
-        self.kospi_current=self.ticker[-1]['price']
+        self.kospi_buy=self.ticker[-1][buy_price_index]
+        self.kospi_current=self.ticker[-1][current_price_index]
         self.kospi_change_pct=round((self.kospi_current-self.kospi_buy)/self.kospi_buy*100,2)
 
     def timerTimeout(self):
@@ -149,7 +163,7 @@ class MainWindow(QMainWindow):
     def update_gui(self):
         self.get_data()
         for row in range(10):
-            self.tableWidget_2.setItem(row, 5, QTableWidgetItem(str(self.ticker[row]['price'])))
+            self.tableWidget_2.setItem(row, 5, QTableWidgetItem(str(self.ticker[row][current_price_index])))
             self.tableWidget_2.setItem(row, 6, QTableWidgetItem(str(self.ticker[row]['current'])))
             self.tableWidget_2.setItem(row, 7, QTableWidgetItem(str(self.ticker[row]['change_pct'])))
             self.tableWidget_2.setItem(row, 8, QTableWidgetItem(str(self.ticker[row]['volume'])))
