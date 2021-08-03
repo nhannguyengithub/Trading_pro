@@ -122,6 +122,9 @@ class MainWindow(QMainWindow):
                          'price': float(df.iat[-1, df.columns.get_loc('Close')]),
                          'volume': float(df.iat[-1, df.columns.get_loc('Volume')])
                          }
+            for j in range(number_of_days-1):
+                self.ticker[i]['day'+str(j)]=float(df.iat[j, df.columns.get_loc('Close')])
+            print(self.ticker[i]['day4'])
             self.ticker[i]['change_pct']=round((self.ticker[i]['price']-self.ticker[i]['buy_price'])/self.ticker[i]['buy_price']*100,2)
             self.ticker[i]['quantity']=int(round(buy_total/10/self.ticker[i]['buy_price'],0))
             self.ticker[i]['buy'] = self.ticker[i]['buy_price']*self.ticker[i]['quantity']
@@ -131,7 +134,7 @@ class MainWindow(QMainWindow):
                 self.buy_sum += self.ticker[i]['buy']
                 self.current_sum += self.ticker[i]['current']
             i += 1
-        print(self.ticker[0])
+
         self.change_pct_sum=round((self.current_sum-self.buy_sum)/self.buy_sum*100,2)
         self.change_sum=round((self.current_sum-self.buy_sum),0)
         self.kospi_buy=self.ticker[-1]['buy_price']
