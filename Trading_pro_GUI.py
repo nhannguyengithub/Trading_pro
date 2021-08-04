@@ -31,12 +31,13 @@ current_time=datetime.datetime.now()
 market_open=current_time.replace(hour = 9, minute = 0, second = 0)
 market_close=current_time.replace(hour = 15, minute = 30, second = 0)
 
-if (current_time <market_open or current_time > market_close):
+if current_time <market_open:
     start_day+=datetime.timedelta(days=1)
 
-number_of_days=(datetime.date.today()-start_day).days
-buy_price_index = 'day0'
-current_price_index = 'day' + str(number_of_days - 2)
+# number_of_days=(datetime.date.today()-start_day).days
+# buy_price_index = 'day0'
+# current_price_index = 'day' + str(number_of_days - 2)
+
 
 ### GUI
 
@@ -80,10 +81,10 @@ class MainWindow(QMainWindow):
         for row in range(10):
             self.tableWidget_2.setItem(row, 0, QTableWidgetItem(self.ticker[row]['name']))
             self.tableWidget_2.setItem(row, 1, QTableWidgetItem(self.ticker[row]['symbol']))
-            self.tableWidget_2.setItem(row, 2, QTableWidgetItem(str(self.ticker[row][buy_price_index])))
+            self.tableWidget_2.setItem(row, 2, QTableWidgetItem(str(self.ticker[row]['day'+str(self.number_of_days-1)])))
             self.tableWidget_2.setItem(row, 3, QTableWidgetItem(str(self.ticker[row]['quantity'])))
             self.tableWidget_2.setItem(row, 4, QTableWidgetItem(str(self.ticker[row]['buy'])))
-            self.tableWidget_2.setItem(row, 5, QTableWidgetItem(str(self.ticker[row][current_price_index])))
+            self.tableWidget_2.setItem(row, 5, QTableWidgetItem(str(self.ticker[row]['day'+str(self.number_of_days-1)])))
             self.tableWidget_2.setItem(row, 6, QTableWidgetItem(str(self.ticker[row]['current'])))
             self.tableWidget_2.setItem(row, 7, QTableWidgetItem(str(self.ticker[row]['change_pct'])))
             self.tableWidget_2.setItem(row, 8, QTableWidgetItem(str(self.ticker[row]['volume'])))
@@ -103,13 +104,13 @@ class MainWindow(QMainWindow):
         self.tableWidget_3.setHorizontalHeaderLabels(['Ngày', 'Danh mục', 'KOSPI'])
 
         i=0
-        for row in range(number_of_days):
-            next_day=start_day+datetime.timedelta(days=row)
+        for row in range(self.number_of_days):
+            next_day=start_day_show+datetime.timedelta(days=row+1)
             if next_day.weekday() != 5 and next_day.weekday() != 6:
                 self.tableWidget_3.setItem(i, 0, QTableWidgetItem(str(next_day)))
-                self.tableWidget_3.setItem(i,2,QTableWidgetItem(str(self.ticker[-1]['day'+str(i+1)])))
-                print(i)
+                self.tableWidget_3.setItem(i, 2, QTableWidgetItem(str(self.kospi_change[row - 1])))
                 i+=1
+
 
         self.tableWidget_3.move(10, 455)
 
@@ -129,14 +130,15 @@ class MainWindow(QMainWindow):
 
         for name, symbol in tickers.items():
             df = pdr.DataReader(symbol, 'naver', start=start_day-datetime.timedelta(days=1), end=datetime.date.today())
-            # print(df)
+
             self.ticker[i] = {'name': name,
                          'symbol': symbol,
                          'buy_price': float(df.iat[0, df.columns.get_loc('Close')]),
                          'price': float(df.iat[-1, df.columns.get_loc('Close')]),
                          'volume': float(df.iat[-1, df.columns.get_loc('Volume')])
                          }
-            for j in range(number_of_days-1):
+            self.number_of_days = len(df)
+            for j in range(self.number_of_days):
                 self.ticker[i]['day'+str(j)]=float(df.iat[j, df.columns.get_loc('Close')])
 
             self.ticker[i]['change_pct']=round((self.ticker[i]['price']-self.ticker[i]['buy_price'])/self.ticker[i]['buy_price']*100,2)
@@ -151,10 +153,13 @@ class MainWindow(QMainWindow):
 
         self.change_pct_sum=round((self.current_sum-self.buy_sum)/self.buy_sum*100,2)
         self.change_sum=round((self.current_sum-self.buy_sum),0)
-        self.kospi_buy=self.ticker[-1][buy_price_index]
-        self.kospi_current=self.ticker[-1][current_price_index]
+        self.kospi_buy=self.ticker[-1]['day0']
+        self.kospi_current=self.ticker[-1]['day'+str(self.number_of_days-1)]
         self.kospi_change_pct=round((self.kospi_current-self.kospi_buy)/self.kospi_buy*100,2)
-
+        self.kospi_change=[]
+        for k in range(self.number_of_days):
+            self.kospi_change.append(round((self.ticker[-1]['day'+str(k)]-self.ticker[-1]['day0'])/self.ticker[-1]['day0']*100,2))
+            print(self.kospi_change[k])
     def timerTimeout(self):
         self.update_gui()
 
