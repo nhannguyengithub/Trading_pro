@@ -127,9 +127,8 @@ class MainWindow(QMainWindow):
         self.buy_sum=0.0
         self.current_sum=0.0
         self.ticker=[]
-        self.buy_price=[]
-        self.buy_quantity=[]
-        self.price=[]
+        self.price = [[]]* len(tickers)
+        self.quantity=[]
         self.change=[]
         self.change_pct=[]
 
@@ -137,6 +136,7 @@ class MainWindow(QMainWindow):
         for name, symbol in tickers.items():
             df=pdr.DataReader(symbol, 'naver', start=start_day-datetime.timedelta(days=1), end=datetime.date.today())
             self.ticker.append(df)
+            # print(self.ticker)
 
             # self.day = pd.to_datetime(df.index).strftime('%Y-%m-%d')
             # print(modified[0])
@@ -150,7 +150,7 @@ class MainWindow(QMainWindow):
             #              'volume': float(df.iat[-1, df.columns.get_loc('Volume')])
             #              }
 
-            # self.number_of_days = len(df)
+            self.number_of_days = len(df)
             # for j in range(self.number_of_days):
             #     self.ticker[i]['day'+str(j)]=float(df.iat[j, df.columns.get_loc('Close')])
             #
@@ -163,12 +163,16 @@ class MainWindow(QMainWindow):
             #     self.buy_sum += self.ticker[i]['buy']
             #     self.current_sum += self.ticker[i]['current']
             # i += 1
-            self.buy_price.append(float(df.iat[0, df.columns.get_loc('Close')]))
-            self.buy_quantity.append(int(round(buy_total/10/self.buy_price[i])))
+            for j in range (self.number_of_days):
+                self.price[i].append(float(df.iat[j, df.columns.get_loc('Close')]))
+            self.quantity.append(int(round(buy_total/10/self.price[i][0])))
             i+=1
+        self.date = pd.to_datetime(df.index).strftime('%Y-%m-%d')
+        print(self.price[0])
+        print(self.price[1])
 
-        self.day = pd.to_datetime(df.index).strftime('%Y-%m-%d')
-        self.number_of_days=len(self.day)
+
+
 
 
 
@@ -179,13 +183,20 @@ class MainWindow(QMainWindow):
         # self.kospi_change_pct=round((self.kospi_current-self.kospi_buy)/self.kospi_buy*100,2)
         # self.change_pct_sum=[]
         # self.kospi_change=[]
-        for k in range(self.number_of_days):
-
-            se
+        # for k in range(self.number_of_days):
+        #     for m in range(len(self.ticker)-1)
+        #         self.sum.append(self.price[m]*self.quantity[m])
+        #         self.total[k]+=
+        #
+        #     self.change.append()
 
             # self.change_pct_sum.append( round((self.current_sum - self.buy_sum) / self.buy_sum * 100, 2))
             # self.kospi_change.append(round((self.ticker[-1]['day'+str(k)]-self.ticker[-1]['day0'])/self.ticker[-1]['day0']*100,2))
-            print(self.kospi_change[k])
+            # print(self.kospi_change[k])
+
+    # def sum(self,ticker,day,sum):
+    #     for i in range(len(self.ticker)-1):
+    #         sum=ticker*self.quantity[i]
     def timerTimeout(self):
         self.update_gui()
 
