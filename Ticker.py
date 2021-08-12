@@ -1,9 +1,4 @@
-import sys
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QWidget, QLabel, QLineEdit, QTableWidget, QTableWidgetItem, QGridLayout, \
-    QSizePolicy
-from PyQt5.QtCore import QSize, QTimer
-# import pyqtgraph as pg
+
 import pandas as pd
 import pandas_datareader.data as pdr
 import time
@@ -25,6 +20,7 @@ with open('tickers.csv', mode='r') as inp:
     tickers = {rows[0]:rows[1] for rows in reader}
 
 
+number_of_tickers=len(tickers)
 start_day = datetime.date(2021, 7, 28)  ### Start day
 
 start_day_show = start_day  ### Show start day
@@ -39,52 +35,8 @@ if current_time < market_open:
 
 ### GUI
 
-class MainWindow(QMainWindow):
+class Ticker:
     def __init__(self):
-        QMainWindow.__init__(self)
-
-        self.setMinimumSize(QSize(960, 700))
-        self.setWindowTitle("Trading Pro")
-
-        self.get_data()
-        global change_pct, kospi_change_pct
-
-        ### Porfolio table
-        self.tableWidget_2 = QTableWidget(self)
-        self.tableWidget_2.resize(530, 650)
-        self.tableWidget_2.setRowCount(11)
-        self.tableWidget_2.setColumnCount(5)
-        # self.tableWidget_2.horizontalHeader().setStretchLastSection(True)
-        self.tableWidget_2.verticalHeader().setFixedWidth(20)
-        self.tableWidget_2.setHorizontalHeaderLabels(
-            ['Tên', 'Mã', 'Giá hiện tại', 'Thay đổi (%)', 'Khối lượng ngày'])
-        self.tableWidget_2.move(10, 10)
-
-        ### initiate cell value
-        for row in range(10):
-            self.tableWidget_2.setItem(row, 0, QTableWidgetItem(self.ticker[row]['name']))
-            self.tableWidget_2.setItem(row, 1, QTableWidgetItem(self.ticker[row]['symbol']))
-            self.tableWidget_2.setItem(row, 2, QTableWidgetItem(str(self.ticker[row]['buy_price'])))
-            self.tableWidget_2.setItem(row, 3, QTableWidgetItem(str(self.ticker[row]['quantity'])))
-            self.tableWidget_2.setItem(row, 4, QTableWidgetItem(str(self.ticker[row]['buy'])))
-            self.tableWidget_2.setItem(row, 5, QTableWidgetItem(str(self.ticker[row]['price'])))
-            self.tableWidget_2.setItem(row, 6, QTableWidgetItem(str(self.ticker[row]['current'])))
-            self.tableWidget_2.setItem(row, 7, QTableWidgetItem(str(self.ticker[row]['change_pct'])))
-            self.tableWidget_2.setItem(row, 8, QTableWidgetItem(str(self.ticker[row]['volume'])))
-        self.tableWidget_2.setItem(10, 3, QTableWidgetItem('Tổng mua'))
-        self.tableWidget_2.setItem(10, 4, QTableWidgetItem(str(self.buy_sum)))
-        self.tableWidget_2.setItem(10, 5, QTableWidgetItem('Tổng hiện tại'))
-        self.tableWidget_2.setItem(10, 6, QTableWidgetItem(str(self.current_sum)))
-        self.tableWidget_2.setItem(10, 7, QTableWidgetItem(str(self.change_pct_sum)))
-
-
-### Set window refresh
-        self.myTimer = QtCore.QTimer(self)
-        self.myTimer.timeout.connect(self.timerTimeout)
-        self.myTimer.start(20000)
-
-### Get data
-    def get_data(self):
         self.ticker = [{} for _ in range(len(tickers))]
         i = 0
         self.buy_sum = 0.0
@@ -92,7 +44,7 @@ class MainWindow(QMainWindow):
         self.price = [[] for _ in range(len(tickers))]
         self.sum = [[] for _ in range(len(tickers))]
         self.total = []
-        self.change = []
+        self.change = [[] for _ in range(len(tickers))]
         self.change_pct = []
         self.kospi_change_pct = []
         self.date = []
@@ -107,8 +59,12 @@ class MainWindow(QMainWindow):
                               'symbol': symbol
                               }
             self.number_of_days = len(df)
+            self.change[i].append(symbol)
             for j in range(self.number_of_days):
                 self.price[i].append(float(df.iat[j, df.columns.get_loc('Close')]))
+                # self.change[i]['day'+str(j)]=(round((self.price[i][j]-self.price[i][0])/self.price[i][0]*100,2))
+                if j!=0:
+                    self.change[i].append(round((self.price[i][j]-self.price[i][0])/self.price[i][0]*100,2))
             self.ticker[i]['buy_price'] = self.price[i][0]
             self.ticker[i]['quantity'] = (int(round(buy_total / 10 / self.price[i][0])))
             self.ticker[i]['price'] = self.price[i][-1]
@@ -136,25 +92,21 @@ class MainWindow(QMainWindow):
         self.kospi_buy = self.price[-1][0]
         self.kospi_current = self.price[-1][-1]
 
-        print(self.price)
+        self.change_sorted=sorted(self.change, key=lambda change: change[self.number_of_days-1],reverse=True)
+        self.change_sorted=self.change_sorted[:10]
 
-    def timerTimeout(self):
-        self.update_gui()
+tic=Ticker()
+print(number_of_tickers)
+for i in range(10):
+    print(tic.change_sorted[i])
+for i in range(10):
+    for j in range(tic.)
 
- ### update cell value
-    def update_gui(self):
-        self.get_data()
-        for row in range(10):
-            self.tableWidget_2.setItem(row, 5, QTableWidgetItem(str(self.ticker[row]['price'])))
-            self.tableWidget_2.setItem(row, 6, QTableWidgetItem(str(self.ticker[row]['current'])))
-            self.tableWidget_2.setItem(row, 7, QTableWidgetItem(str(self.ticker[row]['change_pct'])))
-            self.tableWidget_2.setItem(row, 8, QTableWidgetItem(str(self.ticker[row]['volume'])))
-        self.tableWidget_2.setItem(10, 6, QTableWidgetItem(str(self.current_sum)))
-        self.tableWidget_2.setItem(10, 7, QTableWidgetItem(str(self.change_pct_sum)))
+# print(tic.change)
 
-### Main run
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    mainWin = MainWindow()
-    mainWin.show()
-    sys.exit(app.exec_())
+
+
+
+
+
+
