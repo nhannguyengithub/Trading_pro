@@ -37,7 +37,7 @@ if current_time < market_open:
 
 class Ticker:
     def __init__(self):
-        self.ticker = [{} for _ in range(len(tickers))]
+        self.ticker = {}
         i = 0
         self.buy_sum = 0.0
         self.current_sum = 0.0
@@ -48,6 +48,8 @@ class Ticker:
         self.change_pct = []
         self.kospi_change_pct = []
         self.date = []
+    def get_data(self):
+        i=0
         for name, symbol in tickers.items():
             df = pdr.DataReader(symbol, 'naver', start=start_day - datetime.timedelta(days=1),
                                 end=datetime.date.today())
@@ -55,7 +57,7 @@ class Ticker:
 
             self.day = pd.to_datetime(df.index).strftime('%Y-%m-%d')
 
-            self.ticker[i] = {'name': name,
+            self.ticker[symbol] = {'name': name,
                               'symbol': symbol
                               }
             self.number_of_days = len(df)
@@ -65,19 +67,19 @@ class Ticker:
                 # self.change[i]['day'+str(j)]=(round((self.price[i][j]-self.price[i][0])/self.price[i][0]*100,2))
                 if j!=0:
                     self.change[i].append(round((self.price[i][j]-self.price[i][0])/self.price[i][0]*100,2))
-            self.ticker[i]['buy_price'] = self.price[i][0]
-            self.ticker[i]['quantity'] = (int(round(buy_total / 10 / self.price[i][0])))
-            self.ticker[i]['price'] = self.price[i][-1]
-            self.ticker[i]['change_pct'] = round(
-                (self.ticker[i]['price'] - self.ticker[i]['buy_price']) / self.ticker[i]['buy_price'] * 100, 2)
-            self.ticker[i]['volume'] = float(df.iat[-1, df.columns.get_loc('Volume')])
+            self.ticker[symbol]['buy_price'] = self.price[i][0]
+            self.ticker[symbol]['quantity'] = (int(round(buy_total / 10 / self.price[i][0])))
+            self.ticker[symbol]['price'] = self.price[i][-1]
+            self.ticker[symbol]['change_pct'] = round(
+                (self.ticker[symbol]['price'] - self.ticker[symbol]['buy_price']) / self.ticker[symbol]['buy_price'] * 100, 2)
+            self.ticker[symbol]['volume'] = float(df.iat[-1, df.columns.get_loc('Volume')])
             for j in range(self.number_of_days):
-                self.sum[i].append(self.price[i][j] * self.ticker[i]['quantity'])
-            self.ticker[i]['buy'] = self.sum[i][0]
-            self.ticker[i]['current'] = self.sum[i][-1]
+                self.sum[i].append(self.price[symbol][j] * self.ticker[symbol]['quantity'])
+            self.ticker[symbol]['buy'] = self.sum[i][0]
+            self.ticker[symbol]['current'] = self.sum[i][-1]
             if i != (len(tickers) - 1):
-                self.buy_sum += self.ticker[i]['buy']
-                self.current_sum += self.ticker[i]['current']
+                self.buy_sum += self.ticker[symbol]['buy']
+                self.current_sum += self.ticker[symbol]['current']
             i += 1
         for i in range(self.number_of_days):
             self.date.append(self.day[i])
@@ -95,12 +97,11 @@ class Ticker:
         self.change_sorted=sorted(self.change, key=lambda change: change[self.number_of_days-1],reverse=True)
         self.change_sorted=self.change_sorted[:10]
 
-tic=Ticker()
-print(number_of_tickers)
-for i in range(10):
-    print(tic.change_sorted[i])
-for i in range(10):
-    for j in range(tic.)
+# tic=Ticker()
+# print(number_of_tickers)
+# for i in range(10):
+#     print(tic.ticker[tic.change_sorted[i][0]])
+
 
 # print(tic.change)
 
