@@ -74,11 +74,11 @@ class Ticker:
             self.ticker[symbol]['volume'] = float(df.iat[-1, df.columns.get_loc('Volume')])
             for j in range(self.number_of_days):
                 self.sum[i].append(self.price[i][j] * self.ticker[symbol]['quantity'])
-                self.total_change_pct[i].append(round((self.sum[i][j]-self.sum[i][0])/self.sum[i][0]*100,2))
+                # self.total_change_pct[i].append(round((self.sum[i][j]-self.sum[i][0])/self.sum[i][0]*100,2))
             self.ticker[symbol]['buy'] = self.sum[i][0]
             self.ticker[symbol]['current'] = self.sum[i][-1]
-            self.ticker[symbol]['total']=self.sum[i]
-            self.ticker[symbol]['total_change_pct']=self.total_change_pct[i]
+            # self.ticker[symbol]['total']=self.sum[i]
+            # self.ticker[symbol]['total_change_pct']=self.total_change_pct[i]
             # if i != (len(tickers) - 1):
             #     self.buy_sum += self.ticker[symbol]['buy']
             #     self.current_sum += self.ticker[symbol]['current']
