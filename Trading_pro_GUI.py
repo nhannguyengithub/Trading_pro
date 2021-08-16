@@ -17,16 +17,27 @@ import matplotlib.pyplot as plt
 ### Input data
 
 buy_total = 4000000.0
-tickers = {'TIGER KRX게임K-뉴딜': '364990',
-           'KBSTAR 200철강소재': '285020',
-           'TIGER 200 철강소재': '139240',
-           'KODEX 철강': '117680',
-           'KODEX 2차전지산업': '305720',
-           'KINDEX 미국WideMoat가치주': '309230',
-           'KODEX 게임산업': '300950',
-           'KODEX 배당성장': '211900',
-           'TIGER 우량가치': '227570',
+# tickers = {'TIGER KRX게임K-뉴딜': '364990',
+#            'KBSTAR 200철강소재': '285020',
+#            'TIGER 200 철강소재': '139240',
+#            'KODEX 철강': '117680',
+#            'KODEX 2차전지산업': '305720',
+#            'KINDEX 미국WideMoat가치주': '309230',
+#            'KODEX 게임산업': '300950',
+#            'KODEX 배당성장': '211900',
+#            'TIGER 우량가치': '227570',
+#            'TIGER 2차전지테마': '305540',
+#            'KOSPI': 'KOSPI'}
+tickers = {'KODEX 2차전지산업': '305720',
+           'TIGER 200 헬스케어': '227540',
+           'KODEX 바이오': '244580',
            'TIGER 2차전지테마': '305540',
+           'KODEX 헬스케어': '266420',
+           'TIGER KRX바이오K-뉴딜': '364970',
+           'TIGER 헬스케어': '143860',
+           'TIGER KRX2차전지K-뉴딜': '364980',
+           'TIGER 코스닥150바이오테크': '261070',
+           'TIGER 방송통신': '098560',
            'KOSPI': 'KOSPI'}
 start_day = datetime.date(2021, 7, 28)  ### Start day
 

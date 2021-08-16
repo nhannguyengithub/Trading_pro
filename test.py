@@ -16,28 +16,27 @@ import Ticker
 import matplotlib.pyplot as plt
 
 ### Input data
+global buy_total, start_day
 
 buy_total = 4000000.0
-tickers = {'TIGER KRX게임K-뉴딜': '364990',
-           'KBSTAR 200철강소재': '285020',
-           'TIGER 200 철강소재': '139240',
-           'KODEX 철강': '117680',
-           'KODEX 2차전지산업': '305720',
-           'KINDEX 미국WideMoat가치주': '309230',
-           'KODEX 게임산업': '300950',
-           'KODEX 배당성장': '211900',
-           'TIGER 우량가치': '227570',
-           'TIGER 2차전지테마': '305540',
-           'KOSPI': 'KOSPI'}
+# tickers = {'TIGER KRX게임K-뉴딜': '364990',
+#            'KBSTAR 200철강소재': '285020',
+#            'TIGER 200 철강소재': '139240',
+#            'KODEX 철강': '117680',
+#            'KODEX 2차전지산업': '305720',
+#            'KINDEX 미국WideMoat가치주': '309230',
+#            'KODEX 게임산업': '300950',
+#            'KODEX 배당성장': '211900',
+#            'TIGER 우량가치': '227570',
+#            'TIGER 2차전지테마': '305540',
+#            'KOSPI': 'KOSPI'}
 start_day = datetime.date(2021, 7, 28)  ### Start day
-
-start_day_show = start_day  ### Show start day
 
 current_time = datetime.datetime.now()
 market_open = current_time.replace(hour=9, minute=0, second=0)
 market_close = current_time.replace(hour=15, minute=30, second=0)
 
-if current_time < market_open:
+if (current_time < market_open) or datetime.date.today().weekday()==6:
     start_day += datetime.timedelta(days=1)
 
 tic=Ticker.Ticker()
@@ -63,12 +62,12 @@ class MainWindow(QMainWindow):
         self.tableWidget_1.verticalHeader().setFixedWidth(20)
         self.tableWidget_1.setHorizontalHeaderLabels(['Ngày mua', 'Tổng tiền', 'KOSPI mua', 'KOSPI hiện tại'])
         self.tableWidget_1.move(10, 10)
-        # self.tableWidget_1.setItem(0, 0, QTableWidgetItem(str(start_day_show)))
-        # self.tableWidget_1.setItem(0, 1, QTableWidgetItem(str(buy_total)))
-        # self.tableWidget_1.setItem(0, 2, QTableWidgetItem(str(self.price[-1][0])))
-        # self.tableWidget_1.setItem(0, 3, QTableWidgetItem(str(self.price[-1][-1])))
-        # self.tableWidget_1.setItem(1, 1, QTableWidgetItem('(' + str(self.change_sum) + ')'))
-        # self.tableWidget_1.setItem(1, 3, QTableWidgetItem('(' + str(self.kospi_change_pct[-1]) + '%)'))
+        self.tableWidget_1.setItem(0, 0, QTableWidgetItem(str(tic.day[0])))
+        self.tableWidget_1.setItem(0, 1, QTableWidgetItem(str(buy_total)))
+        self.tableWidget_1.setItem(0, 2, QTableWidgetItem(str(tic.kospi_price[0])))
+        self.tableWidget_1.setItem(0, 3, QTableWidgetItem(str(tic.kospi_price[-1])))
+        self.tableWidget_1.setItem(1, 1, QTableWidgetItem('(' + str(tic.change_sum) + ')'))
+        self.tableWidget_1.setItem(1, 3, QTableWidgetItem('(' + str(tic.kospi_change_pct[-1]) + '%)'))
 
         ### Porfolio table
         self.tableWidget_2 = QTableWidget(self)
@@ -99,20 +98,21 @@ class MainWindow(QMainWindow):
         self.tableWidget_2.setItem(10, 6, QTableWidgetItem(str(tic.current_sum)))
         self.tableWidget_2.setItem(10, 7, QTableWidgetItem(str(tic.change_pct_sum)))
 
-        # ### History table
-        # self.tableWidget_3 = QTableWidget(self)
-        # self.tableWidget_3.resize(340, 240)
-        # self.tableWidget_3.setRowCount(14)
-        # self.tableWidget_3.setColumnCount(3)
-        # self.tableWidget_3.verticalHeader().setFixedWidth(20)
-        # self.tableWidget_3.setHorizontalHeaderLabels(['Ngày', 'Danh mục', 'KOSPI'])
-        # i = 0
-        # for row in range(1, self.number_of_days):
-        #     self.tableWidget_3.setItem(i, 0, QTableWidgetItem(str(self.day[row])))
-        #     self.tableWidget_3.setItem(i, 1, QTableWidgetItem(str(self.change_pct[row])))
-        #     self.tableWidget_3.setItem(i, 2, QTableWidgetItem(str(self.kospi_change_pct[row])))
-        #     i += 1
-        # self.tableWidget_3.move(10, 455)
+### History table
+        self.tableWidget_3 = QTableWidget(self)
+        self.tableWidget_3.resize(340, 240)
+        self.tableWidget_3.setRowCount(14)
+        self.tableWidget_3.setColumnCount(3)
+        self.tableWidget_3.verticalHeader().setFixedWidth(20)
+        self.tableWidget_3.move(10, 455)
+        self.tableWidget_3.setHorizontalHeaderLabels(['Ngày', 'Danh mục', 'KOSPI'])
+        i = 0
+        for row in range(1, tic.number_of_days):
+            self.tableWidget_3.setItem(i, 0, QTableWidgetItem(str(tic.day[row])))
+            # self.tableWidget_3.setItem(i, 1, QTableWidgetItem(str(tic.change_pct[row])))
+            self.tableWidget_3.setItem(i, 2, QTableWidgetItem(str(tic.kospi_change_pct[row])))
+            i += 1
+
         # change_pct = self.change_pct
         # kospi_change_pct = self.kospi_change_pct
 #
@@ -121,9 +121,9 @@ class MainWindow(QMainWindow):
 #         m.move(350, 455)
 
 ### Set window refresh
-        self.myTimer = QtCore.QTimer(self)
-        self.myTimer.timeout.connect(self.timerTimeout)
-        self.myTimer.start(20000)
+        # self.myTimer = QtCore.QTimer(self)
+        # self.myTimer.timeout.connect(self.timerTimeout)
+        # self.myTimer.start(20000)
 
 ### Get data
     def timerTimeout(self):
