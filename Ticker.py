@@ -15,7 +15,7 @@ from csv import  reader
 buy_total = 4000000.0
 tickers={}
 
-with open('tickers.csv', mode='r') as inp:
+with open('tickers.csv', mode='r',encoding = 'CP949') as inp:
     reader = reader(inp)
     tickers = {rows[0]:rows[1] for rows in reader}
 
@@ -63,47 +63,28 @@ class Ticker:
             self.number_of_days = len(df)
             self.change[i].append(symbol)
             self.ticker[symbol]['price1']=[[] for _ in range(self.number_of_days)]
+            self.ticker[symbol]['change1'] = [[] for _ in range(self.number_of_days)]
             for j in range(self.number_of_days):
-                self.price[i].append(float(df.iat[j, df.columns.get_loc('Close')]))
-                # self.change[i]['day'+str(j)]=(round((self.price[i][j]-self.price[i][0])/self.price[i][0]*100,2))
-
-                self.change[i].append(round((self.price[i][j]-self.price[i][0])/self.price[i][0]*100,2))
-                self.ticker[symbol]['price1'][j]=float(df.iat[j, df.columns.get_loc('Close')])
-            self.ticker[symbol]['buy_price'] = self.price[i][0]
-            self.ticker[symbol]['quantity'] = (int(round(buy_total / 10 / self.price[i][0])))
-            self.ticker[symbol]['price'] = self.price[i][-1]
+                self.ticker[symbol]['price1'][j] = float(df.iat[j, df.columns.get_loc('Close')])
+                # self.price[i].append(float(df.iat[j, df.columns.get_loc('Close')]))
+                # self.change[i].append(round((self.price[i][j]-self.price[i][0])/self.price[i][0]*100,2))
+                self.change[i].append(round(
+                    (self.ticker[symbol]['price1'][j] - self.ticker[symbol]['price1'][0]) / self.ticker[symbol]['price1'][0] * 100, 2))
+            self.ticker[symbol]['buy_price'] = self.ticker[symbol]['price1'][0]
+            self.ticker[symbol]['quantity'] = (int(round(buy_total / 10 / self.ticker[symbol]['buy_price'])))
+            self.ticker[symbol]['price'] = self.ticker[symbol]['price1'][-1]
             self.ticker[symbol]['change_pct'] = round(
                 (self.ticker[symbol]['price'] - self.ticker[symbol]['buy_price']) / self.ticker[symbol]['buy_price'] * 100, 2)
             self.ticker[symbol]['volume'] = float(df.iat[-1, df.columns.get_loc('Volume')])
             self.ticker[symbol]['sum1']=[[] for _ in range(self.number_of_days)]
             for j in range(self.number_of_days):
-                self.sum[i].append(self.price[i][j] * self.ticker[symbol]['quantity'])
-                # self.total_change_pct[i].append(round((self.sum[i][j]-self.sum[i][0])/self.sum[i][0]*100,2))
                 self.ticker[symbol]['sum1'][j]=self.ticker[symbol]['price1'][j]*self.ticker[symbol]['quantity']
-            self.ticker[symbol]['buy'] = self.sum[i][0]
-            self.ticker[symbol]['current'] = self.sum[i][-1]
-            # self.ticker[symbol]['total']=self.sum[i]
-            # self.ticker[symbol]['total_change_pct']=self.total_change_pct[i]
-            # if i != (len(tickers) - 1):
-            #     self.buy_sum += self.ticker[symbol]['buy']
-            #     self.current_sum += self.ticker[symbol]['current']
-            print(self.ticker[symbol]['price1'])
-            print(self.ticker[symbol]['sum1'])
+            self.ticker[symbol]['buy'] = self.ticker[symbol]['sum1'][0]
+            self.ticker[symbol]['current'] = self.ticker[symbol]['sum1'][-1]
             i += 1
-        # for i in range(self.number_of_days):
-        #     self.date.append(self.day[i])
-        #     total = 0.0
-        #     for j in range(len(tickers) - 1):
-        #         total += self.sum[j][i]
-        #     self.total.append(total)
-        #     self.change_pct.append(round((self.total[i] - self.total[0]) / self.total[0] * 100, 2))
-        #     self.kospi_change_pct.append(round((self.price[-1][i] - self.price[-1][0]) / self.price[-1][0] * 100, 2))
-        # self.change_pct_sum = round((self.current_sum - self.buy_sum) / self.buy_sum * 100, 2)
-        # self.change_sum = round((self.current_sum - self.buy_sum), 0)
-        # self.kospi_buy = self.price[-1][0]
-        # self.kospi_current = self.price[-1][-1]
 
         self.change_sorted=sorted(self.change, key=lambda change: change[-1],reverse=True)
+
         self.change_sorted=self.change_sorted[:10]
         for i in range(10):
             self.buy_sum+=self.ticker[self.change_sorted[i][0]]['buy']
@@ -114,18 +95,11 @@ class Ticker:
             for i in range(10):
                 self.sum1[j]+=self.ticker[self.change_sorted[i][0]]['sum1'][j]
             self.pct1[j]=round((self.sum1[j] - self.sum1[0]) / self.sum1[0] * 100, 2)
-        print(self.sum1)
-        print(self.pct1)
-
-
         self.change_pct_sum = round((self.current_sum - self.buy_sum) / self.buy_sum * 100, 2)
         self.change_sum = round((self.current_sum - self.buy_sum), 0)
-
         kospi= pdr.DataReader('KOSPI', 'naver', start=start_day - datetime.timedelta(days=1),
                                 end=datetime.date.today())
         for j in range(self.number_of_days):
-
-            ### them change_pct
             self.kospi_price.append(float(kospi.iat[j, kospi.columns.get_loc('Close')]))
             self.kospi_change_pct.append(round((self.kospi_price[j]-self.kospi_price[0])/self.kospi_price[0]*100,2))
         self.kospi_buy=self.kospi_price[0]
