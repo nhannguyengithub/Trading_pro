@@ -37,6 +37,7 @@ class Ticker:
         self.ticker = {}
         i = 0
         self.buy_sum = 0.0
+
         self.current_sum = 0.0
         self.price = [[] for _ in range(len(tickers))]
         self.sum = [[] for _ in range(len(tickers))]
@@ -61,20 +62,24 @@ class Ticker:
                               }
             self.number_of_days = len(df)
             self.change[i].append(symbol)
+            self.ticker[symbol]['price1']=[[] for _ in range(self.number_of_days)]
             for j in range(self.number_of_days):
                 self.price[i].append(float(df.iat[j, df.columns.get_loc('Close')]))
                 # self.change[i]['day'+str(j)]=(round((self.price[i][j]-self.price[i][0])/self.price[i][0]*100,2))
 
                 self.change[i].append(round((self.price[i][j]-self.price[i][0])/self.price[i][0]*100,2))
+                self.ticker[symbol]['price1'][j]=float(df.iat[j, df.columns.get_loc('Close')])
             self.ticker[symbol]['buy_price'] = self.price[i][0]
             self.ticker[symbol]['quantity'] = (int(round(buy_total / 10 / self.price[i][0])))
             self.ticker[symbol]['price'] = self.price[i][-1]
             self.ticker[symbol]['change_pct'] = round(
                 (self.ticker[symbol]['price'] - self.ticker[symbol]['buy_price']) / self.ticker[symbol]['buy_price'] * 100, 2)
             self.ticker[symbol]['volume'] = float(df.iat[-1, df.columns.get_loc('Volume')])
+            self.ticker[symbol]['sum1']=[[] for _ in range(self.number_of_days)]
             for j in range(self.number_of_days):
                 self.sum[i].append(self.price[i][j] * self.ticker[symbol]['quantity'])
                 # self.total_change_pct[i].append(round((self.sum[i][j]-self.sum[i][0])/self.sum[i][0]*100,2))
+                self.ticker[symbol]['sum1'][j]=self.ticker[symbol]['price1'][j]*self.ticker[symbol]['quantity']
             self.ticker[symbol]['buy'] = self.sum[i][0]
             self.ticker[symbol]['current'] = self.sum[i][-1]
             # self.ticker[symbol]['total']=self.sum[i]
@@ -82,6 +87,8 @@ class Ticker:
             # if i != (len(tickers) - 1):
             #     self.buy_sum += self.ticker[symbol]['buy']
             #     self.current_sum += self.ticker[symbol]['current']
+            print(self.ticker[symbol]['price1'])
+            print(self.ticker[symbol]['sum1'])
             i += 1
         # for i in range(self.number_of_days):
         #     self.date.append(self.day[i])
@@ -101,6 +108,16 @@ class Ticker:
         for i in range(10):
             self.buy_sum+=self.ticker[self.change_sorted[i][0]]['buy']
             self.current_sum+=self.ticker[self.change_sorted[i][0]]['current']
+        self.sum1 = [0.0 for i in range(self.number_of_days)]
+        self.pct1 = [0.0 for i in range(self.number_of_days)]
+        for j in range(self.number_of_days):
+            for i in range(10):
+                self.sum1[j]+=self.ticker[self.change_sorted[i][0]]['sum1'][j]
+            self.pct1[j]=round((self.sum1[j] - self.sum1[0]) / self.sum1[0] * 100, 2)
+        print(self.sum1)
+        print(self.pct1)
+
+
         self.change_pct_sum = round((self.current_sum - self.buy_sum) / self.buy_sum * 100, 2)
         self.change_sum = round((self.current_sum - self.buy_sum), 0)
 

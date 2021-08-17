@@ -109,16 +109,16 @@ class MainWindow(QMainWindow):
         i = 0
         for row in range(1, tic.number_of_days):
             self.tableWidget_3.setItem(i, 0, QTableWidgetItem(str(tic.day[row])))
-            # self.tableWidget_3.setItem(i, 1, QTableWidgetItem(str(tic.change_pct[row])))
+            self.tableWidget_3.setItem(i, 1, QTableWidgetItem(str(tic.pct1[row])))
             self.tableWidget_3.setItem(i, 2, QTableWidgetItem(str(tic.kospi_change_pct[row])))
             i += 1
 
-        # change_pct = self.change_pct
-        # kospi_change_pct = self.kospi_change_pct
+        change_pct = tic.pct1
+        kospi_change_pct = tic.kospi_change_pct
 #
-# ### Plot data
-#         m = PlotCanvas(self, width=8, height=4)
-#         m.move(350, 455)
+### Plot data
+        m = PlotCanvas(self, width=8, height=4)
+        m.move(350, 455)
 
 ### Set window refresh
         # self.myTimer = QtCore.QTimer(self)
@@ -147,34 +147,34 @@ class MainWindow(QMainWindow):
         # self.tableWidget_3.setItem(self.number_of_days - 2, 2,
         #                            QTableWidgetItem(str(self.kospi_change_pct[self.number_of_days - 1])))
 #
-# class PlotCanvas(FigureCanvas):
-#     def __init__(self, parent=None, width=1, height=2, dpi=60):
-#         fig = Figure(figsize=(width, height), dpi=dpi)
-#         # self.axes = fig.add_subplot(111)
-#         FigureCanvas.__init__(self, fig)
-#         self.setParent(parent)
-#
-#         FigureCanvas.setSizePolicy(self,
-#                                    QSizePolicy.Expanding,
-#                                    QSizePolicy.Expanding)
-#         FigureCanvas.updateGeometry(self)
-#         self.plot()
-#
-#     def plot(self):
-#         # data = [random.random() for i in range(25)]
-#         # data=MainWindow()
-#         # data_x=data.date
-#         # data_y=data.change_pct
-#
-#         ax = self.figure.add_subplot(111)
-#         ax.plot(change_pct, 'b-', label='Danh muc')
-#         ax.plot(kospi_change_pct, 'r-', label='Kospi')
-#         ax.legend()
-#         ax.grid()
-#         ax.set_title('Lịch sử thay đổi')
-#         ax.set_xlabel('Ngay')
-#         ax.set_ylabel('Thay doi')
-#         self.draw()
+class PlotCanvas(FigureCanvas):
+    def __init__(self, parent=None, width=1, height=2, dpi=60):
+        fig = Figure(figsize=(width, height), dpi=dpi)
+        # self.axes = fig.add_subplot(111)
+        FigureCanvas.__init__(self, fig)
+        self.setParent(parent)
+
+        FigureCanvas.setSizePolicy(self,
+                                   QSizePolicy.Expanding,
+                                   QSizePolicy.Expanding)
+        FigureCanvas.updateGeometry(self)
+        self.plot()
+
+    def plot(self):
+        # data = [random.random() for i in range(25)]
+        # data=MainWindow()
+        # data_x=data.date
+        # data_y=data.change_pct
+
+        ax = self.figure.add_subplot(111)
+        ax.plot(change_pct, 'b-', label='Danh muc')
+        ax.plot(kospi_change_pct, 'r-', label='Kospi')
+        ax.legend()
+        ax.grid()
+        ax.set_title('Lịch sử thay đổi')
+        ax.set_xlabel('Ngay')
+        ax.set_ylabel('Thay doi')
+        self.draw()
 ### Main run
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
