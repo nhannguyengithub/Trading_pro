@@ -44,8 +44,9 @@ class MainWindow(QMainWindow):
         self.tableWidget_1.move(10, 10)
         self.tableWidget_1.setItem(0, 0, QTableWidgetItem(str(tic.day[tic.start_day_index])))
         self.tableWidget_1.setItem(0, 1, QTableWidgetItem(str(buy_total)))
-        self.tableWidget_1.setItem(0, 2, QTableWidgetItem(str(tic.kospi_price[0])))
+        self.tableWidget_1.setItem(0, 2, QTableWidgetItem(str(tic.kospi_price[tic.start_day_index])))
         self.tableWidget_1.setItem(0, 3, QTableWidgetItem(str(tic.kospi_price[-1])))
+        self.tableWidget_1.setItem(1, 0, QTableWidgetItem('('+str(tic.day[-1])+')'))
         self.tableWidget_1.setItem(1, 1, QTableWidgetItem('(' + str(tic.change_sum) + ')'))
         self.tableWidget_1.setItem(1, 3, QTableWidgetItem('(' + str(tic.kospi_change_pct[-1]) + '%)'))
 

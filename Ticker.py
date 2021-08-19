@@ -19,7 +19,7 @@ with open('tickers.csv', mode='r', encoding='CP949') as inp:
     tickers = {rows[0]: rows[1] for rows in reader}
 
 number_of_tickers = len(tickers)
-start_day = datetime.date(2021, 8, 11)  ### Start day
+start_day = datetime.date(2019, 6, 27)  ### Start day
 
 current_time = datetime.datetime.now()
 market_open = current_time.replace(hour=9, minute=0, second=0)
@@ -42,24 +42,41 @@ class Ticker:
         self.kospi_price = []
 
     def get_data(self):
+        kospi = pdr.DataReader('KOSPI', 'naver', start=start_day- datetime.timedelta(days=14),
+                               end=start_day + datetime.timedelta(days=14))
+        # end=datetime.date.today())
+        self.day = (pd.to_datetime(kospi.index).strftime('%Y-%m-%d')).tolist()
+        self.number_of_days = len(kospi)
+        self.start_day_index = self.day.index(start_day.strftime('%Y-%m-%d'))
+
+        for j in range(self.number_of_days):
+            self.kospi_price.append(float(kospi.iat[j, kospi.columns.get_loc('Close')]))
+        for j in range(self.number_of_days):
+            self.kospi_change_pct.append(
+                round((self.kospi_price[j] - self.kospi_price[self.start_day_index]) / self.kospi_price[self.start_day_index] * 100, 2))
+        self.kospi_buy = self.kospi_price[0]
+        self.kospi_current = self.kospi_price[-1]
         i = 0
         for name, symbol in tickers.items():
             df = pdr.DataReader(symbol, 'naver', start=start_day- datetime.timedelta(days=14),
-                                end=datetime.date.today())
+                                end=start_day+ datetime.timedelta(days=14))
+                                # end=datetime.date.today())
+            print(df)
+            self.day1 = (pd.to_datetime(df.index).strftime('%Y-%m-%d')).tolist()
+            if self.day1==[]:
+                continue
 
-            self.day = (pd.to_datetime(df.index).strftime('%Y-%m-%d')).tolist()
-            self.start_day_index=self.day.index(start_day.strftime('%Y-%m-%d'))
 
 
             self.ticker[symbol] = {'name': name,
                                    'symbol': symbol
                                    }
-            self.number_of_days = len(df)
+
             self.change[i].append(symbol)
             self.ticker[symbol]['price1'] = [[] for _ in range(self.number_of_days)]
             self.ticker[symbol]['change1'] = [[] for _ in range(self.number_of_days)]
             for j in range(self.number_of_days):
-                self.ticker[symbol]['price1'][j] = float(df.iat[j, df.columns.get_loc('Close')])
+                self.ticker[symbol]['price1'][j] = float(df.iat[j, df.columns.get_loc('Close')])   ### loi khong co du lieu
                 self.change[i].append(round(
                     (self.ticker[symbol]['price1'][j] - self.ticker[symbol]['price1'][0]) /
                     self.ticker[symbol]['price1'][0] * 100, 2))
@@ -75,11 +92,14 @@ class Ticker:
                 self.ticker[symbol]['sum1'][j] = self.ticker[symbol]['price1'][j] * self.ticker[symbol]['quantity']
             self.ticker[symbol]['buy'] = self.ticker[symbol]['sum1'][self.start_day_index]
             self.ticker[symbol]['current'] = self.ticker[symbol]['sum1'][-1]
+            print(i)
             i += 1
-
+        self.change = self.change[:i]
+        print(self.start_day_index)
+        print(len(self.change))
+        for i in range(75):
+            print(self.change[i])
         self.change_sorted = sorted(self.change, key=lambda change: change[self.start_day_index+1], reverse=True)
-        for i in range(len(tickers)):
-            print(self.change_sorted[i])
 
         self.change_sorted = self.change_sorted[:10]
 
@@ -94,14 +114,7 @@ class Ticker:
             self.pct1[j] = round((self.sum1[j] - self.sum1[0]) / self.sum1[0] * 100, 2)
         self.change_pct_sum = round((self.current_sum - self.buy_sum) / self.buy_sum * 100, 2)
         self.change_sum = round((self.current_sum - self.buy_sum), 0)
-        kospi = pdr.DataReader('KOSPI', 'naver', start=start_day- datetime.timedelta(days=14),
-                               end=datetime.date.today())
-        for j in range(self.number_of_days):
-            self.kospi_price.append(float(kospi.iat[j, kospi.columns.get_loc('Close')]))
-            self.kospi_change_pct.append(
-                round((self.kospi_price[j] - self.kospi_price[0]) / self.kospi_price[0] * 100, 2))
-        self.kospi_buy = self.kospi_price[0]
-        self.kospi_current = self.kospi_price[-1]
+
 
 # tic=Ticker()
 # tic.get_data()
