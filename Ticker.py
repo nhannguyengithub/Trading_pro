@@ -47,7 +47,9 @@ class Ticker:
             df = pdr.DataReader(symbol, 'naver', start=start_day- datetime.timedelta(days=14),
                                 end=datetime.date.today())
 
-            self.day = pd.to_datetime(df.index).strftime('%Y-%m-%d')
+            self.day = (pd.to_datetime(df.index).strftime('%Y-%m-%d')).tolist()
+            self.start_day_index=self.day.index(start_day.strftime('%Y-%m-%d'))
+
 
             self.ticker[symbol] = {'name': name,
                                    'symbol': symbol
@@ -61,7 +63,7 @@ class Ticker:
                 self.change[i].append(round(
                     (self.ticker[symbol]['price1'][j] - self.ticker[symbol]['price1'][0]) /
                     self.ticker[symbol]['price1'][0] * 100, 2))
-            self.ticker[symbol]['buy_price'] = self.ticker[symbol]['price1'][10]
+            self.ticker[symbol]['buy_price'] = self.ticker[symbol]['price1'][self.start_day_index]
             self.ticker[symbol]['quantity'] = (int(round(buy_total / 10 / self.ticker[symbol]['buy_price'])))
             self.ticker[symbol]['price'] = self.ticker[symbol]['price1'][-1]
             self.ticker[symbol]['change_pct'] = round(
@@ -71,22 +73,25 @@ class Ticker:
             self.ticker[symbol]['sum1'] = [[] for _ in range(self.number_of_days)]
             for j in range(self.number_of_days):
                 self.ticker[symbol]['sum1'][j] = self.ticker[symbol]['price1'][j] * self.ticker[symbol]['quantity']
-            self.ticker[symbol]['buy'] = self.ticker[symbol]['sum1'][0]
+            self.ticker[symbol]['buy'] = self.ticker[symbol]['sum1'][self.start_day_index]
             self.ticker[symbol]['current'] = self.ticker[symbol]['sum1'][-1]
             i += 1
 
-        self.change_sorted = sorted(self.change, key=lambda change: change[10], reverse=True)
+        self.change_sorted = sorted(self.change, key=lambda change: change[self.start_day_index+1], reverse=True)
+        for i in range(len(tickers)):
+            print(self.change_sorted[i])
 
         self.change_sorted = self.change_sorted[:10]
+
         for i in range(10):
             self.buy_sum += self.ticker[self.change_sorted[i][0]]['buy']
             self.current_sum += self.ticker[self.change_sorted[i][0]]['current']
         self.sum1 = [0.0 for i in range(self.number_of_days)]
         self.pct1 = [0.0 for i in range(self.number_of_days)]
-        for j in range(10,self.number_of_days):
+        for j in range(0,self.number_of_days):
             for i in range(10):
                 self.sum1[j] += self.ticker[self.change_sorted[i][0]]['sum1'][j]
-            self.pct1[j] = round((self.sum1[j] - self.sum1[10]) / self.sum1[10] * 100, 2)
+            self.pct1[j] = round((self.sum1[j] - self.sum1[0]) / self.sum1[0] * 100, 2)
         self.change_pct_sum = round((self.current_sum - self.buy_sum) / self.buy_sum * 100, 2)
         self.change_sum = round((self.current_sum - self.buy_sum), 0)
         kospi = pdr.DataReader('KOSPI', 'naver', start=start_day- datetime.timedelta(days=14),

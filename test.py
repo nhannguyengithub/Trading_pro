@@ -42,7 +42,7 @@ class MainWindow(QMainWindow):
         self.tableWidget_1.verticalHeader().setFixedWidth(20)
         self.tableWidget_1.setHorizontalHeaderLabels(['Ngày mua', 'Tổng tiền', 'KOSPI mua', 'KOSPI hiện tại'])
         self.tableWidget_1.move(10, 10)
-        self.tableWidget_1.setItem(0, 0, QTableWidgetItem(str(tic.day[10])))
+        self.tableWidget_1.setItem(0, 0, QTableWidgetItem(str(tic.day[tic.start_day_index])))
         self.tableWidget_1.setItem(0, 1, QTableWidgetItem(str(buy_total)))
         self.tableWidget_1.setItem(0, 2, QTableWidgetItem(str(tic.kospi_price[0])))
         self.tableWidget_1.setItem(0, 3, QTableWidgetItem(str(tic.kospi_price[-1])))
