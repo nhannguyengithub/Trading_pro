@@ -19,7 +19,7 @@ with open('tickers.csv', mode='r', encoding='CP949') as inp:
     tickers = {rows[0]: rows[1] for rows in reader}
 
 number_of_tickers = len(tickers)
-start_day = datetime.date(2019, 6, 27)  ### Start day
+start_day = datetime.date(2021, 8, 10)  ### Start day
 
 current_time = datetime.datetime.now()
 market_open = current_time.replace(hour=9, minute=0, second=0)
@@ -61,7 +61,6 @@ class Ticker:
             df = pdr.DataReader(symbol, 'naver', start=start_day- datetime.timedelta(days=14),
                                 end=start_day+ datetime.timedelta(days=14))
                                 # end=datetime.date.today())
-            print(df)
             self.day1 = (pd.to_datetime(df.index).strftime('%Y-%m-%d')).tolist()
             if self.day1==[]:
                 continue
