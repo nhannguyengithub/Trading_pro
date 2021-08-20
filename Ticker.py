@@ -19,7 +19,7 @@ with open('tickers.csv', mode='r', encoding='CP949') as inp:
     tickers = {rows[0]: rows[1] for rows in reader}
 
 number_of_tickers = len(tickers)
-start_day = datetime.date(2021, 8, 10)  ### Start day
+start_day = datetime.date(2019, 6, 24)  ### Start day
 
 current_time = datetime.datetime.now()
 market_open = current_time.replace(hour=9, minute=0, second=0)
@@ -42,7 +42,7 @@ class Ticker:
         self.kospi_price = []
 
     def get_data(self):
-        kospi = pdr.DataReader('KOSPI', 'naver', start=start_day- datetime.timedelta(days=14),
+        kospi = pdr.DataReader('KOSPI', 'naver', start=start_day- datetime.timedelta(days=7),
                                end=start_day + datetime.timedelta(days=14))
         # end=datetime.date.today())
         self.day = (pd.to_datetime(kospi.index).strftime('%Y-%m-%d')).tolist()
@@ -58,11 +58,11 @@ class Ticker:
         self.kospi_current = self.kospi_price[-1]
         i = 0
         for name, symbol in tickers.items():
-            df = pdr.DataReader(symbol, 'naver', start=start_day- datetime.timedelta(days=14),
+            df = pdr.DataReader(symbol, 'naver', start=start_day- datetime.timedelta(days=7),
                                 end=start_day+ datetime.timedelta(days=14))
                                 # end=datetime.date.today())
             self.day1 = (pd.to_datetime(df.index).strftime('%Y-%m-%d')).tolist()
-            if self.day1==[]:
+            if len(self.day1)<len(self.day):
                 continue
 
 
@@ -88,21 +88,28 @@ class Ticker:
             self.ticker[symbol]['volume'] = float(df.iat[-1, df.columns.get_loc('Volume')])
             self.ticker[symbol]['sum1'] = [[] for _ in range(self.number_of_days)]
             for j in range(self.number_of_days):
+                if j>self.start_day_index and self.ticker[symbol]['price1'][j]<self.ticker[symbol]['price1'][self.start_day_index]*0.97:
+                    self.ticker[symbol]['price1'][j]=self.ticker[symbol]['price1'][self.start_day_index]*0.97
+                    self.ticker[symbol]['change_pct']=-3.0
+
                 self.ticker[symbol]['sum1'][j] = self.ticker[symbol]['price1'][j] * self.ticker[symbol]['quantity']
             self.ticker[symbol]['buy'] = self.ticker[symbol]['sum1'][self.start_day_index]
             self.ticker[symbol]['current'] = self.ticker[symbol]['sum1'][-1]
+            # for j in range(self.number_of_days):
+            #     if self.change_sorted[j]<-3.0:
+            #         self.change_sorted[j]=-3.0
             print(i)
             i += 1
         self.change = self.change[:i]
         print(self.start_day_index)
         print(len(self.change))
-        for i in range(75):
-            print(self.change[i])
         self.change_sorted = sorted(self.change, key=lambda change: change[self.start_day_index+1], reverse=True)
 
         self.change_sorted = self.change_sorted[:10]
 
+
         for i in range(10):
+
             self.buy_sum += self.ticker[self.change_sorted[i][0]]['buy']
             self.current_sum += self.ticker[self.change_sorted[i][0]]['current']
         self.sum1 = [0.0 for i in range(self.number_of_days)]
