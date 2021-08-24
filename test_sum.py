@@ -19,11 +19,12 @@ with open('tickers.csv', mode='r', encoding='CP949') as inp:
     tickers = {rows[0]: rows[1] for rows in reader}
 
 number_of_tickers = len(tickers)
-start_day = datetime.date(2021, 2, 15)  ### Start day
+start_day = datetime.date(2021, 1, 4)  ### Start day
 
 current_time = datetime.datetime.now()
 market_open = current_time.replace(hour=9, minute=0, second=0)
 market_close = current_time.replace(hour=15, minute=30, second=0)
+sum_change=0.0
 
 # if (current_time < market_open) or datetime.date.today().weekday() == 6:
 #     start_day += datetime.timedelta(days=1)
@@ -40,8 +41,19 @@ class Ticker:
         self.kospi_change_pct = []
         self.date = []
         self.kospi_price = []
-
     def get_data(self):
+        self.ticker = {}
+        self.buy_sum = 0.0
+        self.current_sum = 0.0
+        self.total = []
+        self.change = [[] for _ in range(len(tickers))]
+        self.total_change_pct = [[] for _ in range(len(tickers))]
+        self.change_pct = []
+        self.kospi_change_pct = []
+        self.date = []
+        self.kospi_price = []
+        global sum_change
+        print(start_day)
         kospi = pdr.DataReader('KOSPI', 'naver', start=start_day- datetime.timedelta(days=7),
                                end=start_day + datetime.timedelta(days=14))
         # end=datetime.date.today())
@@ -120,11 +132,22 @@ class Ticker:
             self.pct1[j] = round((self.sum1[j] - self.sum1[0]) / self.sum1[0] * 100, 2)
         self.change_pct_sum = round((self.current_sum - self.buy_sum) / self.buy_sum * 100, 2)
         self.change_sum = round((self.current_sum - self.buy_sum), 0)
-        print(self.number_of_days)
+        print(self.change_pct_sum)
+        sum_change+=self.change_pct_sum
+        print(sum_change)
 
 
-# tic=Ticker()
-# tic.get_data()
+tic=Ticker()
+tic.get_data()
+print(sum_change)
+while start_day<datetime.date(2021, 8, 25):
+    try:
+        start_day+=datetime.timedelta(days=14)
+        tic.get_data()
+    except:
+        start_day += datetime.timedelta(days=2)
+        tic.get_data()
+    print(sum_change)
 # for i in range(10):
-#     print(tic.ticker[tic.change_sorted[i][0]])
-# print(tic.change)
+# #     print(tic.ticker[tic.change_sorted[i][0]])
+# # print(tic.change)
