@@ -19,7 +19,7 @@ with open('tickers.csv', mode='r', encoding='CP949') as inp:
     tickers = {rows[0]: rows[1] for rows in reader}
 
 number_of_tickers = len(tickers)
-start_day = datetime.date(2019, 6, 24)  ### Start day
+start_day = datetime.date(2018, 6, 18)  ### Start day
 
 current_time = datetime.datetime.now()
 market_open = current_time.replace(hour=9, minute=0, second=0)
@@ -120,6 +120,7 @@ class Ticker:
             self.pct1[j] = round((self.sum1[j] - self.sum1[0]) / self.sum1[0] * 100, 2)
         self.change_pct_sum = round((self.current_sum - self.buy_sum) / self.buy_sum * 100, 2)
         self.change_sum = round((self.current_sum - self.buy_sum), 0)
+        print(self.number_of_days)
 
 
 # tic=Ticker()
