@@ -19,7 +19,7 @@ with open('tickers.csv', mode='r', encoding='CP949') as inp:
     tickers = {rows[0]: rows[1] for rows in reader}
 
 number_of_tickers = len(tickers)
-start_day = datetime.date(2021, 1, 4)  ### Start day
+start_day = datetime.date(2018, 1, 4)  ### Start day
 
 current_time = datetime.datetime.now()
 market_open = current_time.replace(hour=9, minute=0, second=0)
@@ -54,7 +54,7 @@ class Ticker:
         self.kospi_price = []
         global sum_change
         print(start_day)
-        kospi = pdr.DataReader('KOSPI', 'naver', start=start_day- datetime.timedelta(days=7),
+        kospi = pdr.DataReader('KOSPI', 'naver', start=start_day- datetime.timedelta(days=14),
                                end=start_day + datetime.timedelta(days=14))
         # end=datetime.date.today())
         self.day = (pd.to_datetime(kospi.index).strftime('%Y-%m-%d')).tolist()
@@ -70,7 +70,7 @@ class Ticker:
         self.kospi_current = self.kospi_price[-1]
         i = 0
         for name, symbol in tickers.items():
-            df = pdr.DataReader(symbol, 'naver', start=start_day- datetime.timedelta(days=7),
+            df = pdr.DataReader(symbol, 'naver', start=start_day- datetime.timedelta(days=14),
                                 end=start_day+ datetime.timedelta(days=14))
                                 # end=datetime.date.today())
             self.day1 = (pd.to_datetime(df.index).strftime('%Y-%m-%d')).tolist()
@@ -110,11 +110,11 @@ class Ticker:
             # for j in range(self.number_of_days):
             #     if self.change_sorted[j]<-3.0:
             #         self.change_sorted[j]=-3.0
-            print(i)
+            # print(i)
             i += 1
         self.change = self.change[:i]
-        print(self.start_day_index)
-        print(len(self.change))
+        # print(self.start_day_index)
+        # print(len(self.change))
         self.change_sorted = sorted(self.change, key=lambda change: change[self.start_day_index+1], reverse=True)
 
         self.change_sorted = self.change_sorted[:10]
@@ -140,12 +140,12 @@ class Ticker:
 tic=Ticker()
 tic.get_data()
 print(sum_change)
-while start_day<datetime.date(2021, 8, 25):
+while start_day<datetime.date(2018, 12, 25):
     try:
         start_day+=datetime.timedelta(days=14)
         tic.get_data()
     except:
-        start_day += datetime.timedelta(days=2)
+        start_day += datetime.timedelta(days=7)
         tic.get_data()
     print(sum_change)
 # for i in range(10):

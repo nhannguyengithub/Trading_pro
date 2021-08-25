@@ -19,7 +19,7 @@ with open('tickers.csv', mode='r', encoding='CP949') as inp:
     tickers = {rows[0]: rows[1] for rows in reader}
 
 number_of_tickers = len(tickers)
-start_day = datetime.date(2021, 2, 15)  ### Start day
+start_day = datetime.date(2021, 8, 25)  ### Start day
 
 current_time = datetime.datetime.now()
 market_open = current_time.replace(hour=9, minute=0, second=0)
@@ -42,7 +42,7 @@ class Ticker:
         self.kospi_price = []
 
     def get_data(self):
-        kospi = pdr.DataReader('KOSPI', 'naver', start=start_day- datetime.timedelta(days=7),
+        kospi = pdr.DataReader('KOSPI', 'naver', start=start_day- datetime.timedelta(days=14),
                                end=start_day + datetime.timedelta(days=14))
         # end=datetime.date.today())
         self.day = (pd.to_datetime(kospi.index).strftime('%Y-%m-%d')).tolist()
@@ -58,7 +58,7 @@ class Ticker:
         self.kospi_current = self.kospi_price[-1]
         i = 0
         for name, symbol in tickers.items():
-            df = pdr.DataReader(symbol, 'naver', start=start_day- datetime.timedelta(days=7),
+            df = pdr.DataReader(symbol, 'naver', start=start_day- datetime.timedelta(days=14),
                                 end=start_day+ datetime.timedelta(days=14))
                                 # end=datetime.date.today())
             self.day1 = (pd.to_datetime(df.index).strftime('%Y-%m-%d')).tolist()
